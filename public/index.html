@@ -7,6 +7,8 @@
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
   <title>Cemetery Dashboard</title>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+        integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
   <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
@@ -60,19 +62,40 @@
       </form>
     </section>
 
-    <!-- Search -->
+    <!-- Records viewer -->
     <section class="card">
-      <h2>Search records</h2>
+      <div class="viewer-head">
+        <h2>Records</h2>
+        <div class="tabs" role="tablist">
+          <button class="tab active" id="tabList" role="tab" aria-selected="true">List</button>
+          <button class="tab" id="tabMap" role="tab" aria-selected="false">Map</button>
+        </div>
+      </div>
       <div class="search-wrap">
         <input id="search" type="search" inputmode="search"
                placeholder="Search by name, section, plot, notes…" autocomplete="off" />
       </div>
+      <p class="muted" id="viewerInfo"></p>
       <div id="results" class="results"></div>
+      <div id="map" class="map" hidden></div>
     </section>
   </main>
 
+  <!-- Detail view -->
+  <div class="modal" id="detail" hidden>
+    <div class="modal-card" role="dialog" aria-modal="true" aria-labelledby="dName">
+      <button class="modal-close" id="detailClose" aria-label="Close">✕</button>
+      <h2 id="dName"></h2>
+      <dl class="detail-grid" id="dGrid"></dl>
+      <div id="dNotes" class="detail-notes"></div>
+      <div class="detail-actions" id="dActions"></div>
+    </div>
+  </div>
+
   <div class="toast" id="toast" role="status" aria-live="polite"></div>
 
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+          integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
   <script src="app.js"></script>
 </body>
 </html>
