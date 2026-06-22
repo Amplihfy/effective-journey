@@ -150,7 +150,6 @@ $('recordForm').addEventListener('submit', async (e) => {
     plot: $('plot').value.trim() || null,
     birth_date: $('birth_date').value || null,
     death_date: $('death_date').value || null,
-    burial_date: $('burial_date').value || null,
     notes: $('notes').value.trim() || null,
     recorded_by: session.operator || null,
     ...(coords || {}),

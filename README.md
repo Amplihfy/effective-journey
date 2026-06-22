@@ -8,7 +8,7 @@ entry is instantly searchable from any device on the network.
 ## Features
 
 - **Sessions** — each survey/data-entry session is recorded with operator + device.
-- **Records** — deceased name, section, plot, birth/death/burial dates, GPS
+- **Records** — deceased name, section, plot, birth/death dates, GPS
   coordinates, and free-form notes.
 - **Full-text search** — SQLite **FTS5** powers fast, typo-tolerant prefix search
   across names, sections, plots, and notes.

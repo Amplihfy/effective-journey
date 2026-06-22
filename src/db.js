@@ -35,7 +35,6 @@ db.exec(`
     plot          TEXT,
     birth_date    TEXT,
     death_date    TEXT,
-    burial_date   TEXT,
     latitude      REAL,
     longitude     REAL,
     notes         TEXT,
@@ -103,7 +102,7 @@ export function endSession(id) {
 // --- Record helpers ---------------------------------------------------------
 const RECORD_FIELDS = [
   'deceased_name', 'section', 'plot', 'birth_date', 'death_date',
-  'burial_date', 'latitude', 'longitude', 'notes', 'recorded_by',
+  'latitude', 'longitude', 'notes', 'recorded_by',
 ];
 
 export function addRecord(sessionId, data) {
