@@ -54,11 +54,23 @@
           <label class="field"><span>Died</span><input id="death_date" type="date" /></label>
         </div>
         <textarea id="notes" placeholder="Notes (inscription, condition, etc.)"></textarea>
+
+        <div class="photos-field">
+          <label class="btn ghost photo-add">
+            📷 Add photos
+            <input id="photoInput" type="file" accept="image/*" capture="environment" multiple hidden />
+          </label>
+          <div id="photoPreview" class="thumbs"></div>
+        </div>
+
         <div class="row">
           <button class="btn primary" type="submit">Save record</button>
           <button class="btn ghost" type="button" id="geoBtn">📍 Use my location</button>
         </div>
-        <p class="muted" id="geoStatus"></p>
+        <div class="geo-status">
+          <span class="muted" id="geoStatus"></span>
+          <button class="btn ghost copy-coords" type="button" id="geoCopy" hidden>Copy GPS</button>
+        </div>
       </form>
     </section>
 
@@ -88,6 +100,7 @@
       <h2 id="dName"></h2>
       <dl class="detail-grid" id="dGrid"></dl>
       <div id="dNotes" class="detail-notes"></div>
+      <div id="dPhotos" class="thumbs detail-photos"></div>
       <div class="detail-actions" id="dActions"></div>
     </div>
   </div>

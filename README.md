@@ -14,7 +14,10 @@ entry is instantly searchable from any device on the network.
   across names, sections, plots, and notes.
 - **Responsive UI** — mobile-first layout with iOS safe-area support; the same
   app works on iPhone, iPad, and desktop.
-- **GPS capture** — tag a record with the phone's location; results link out to a map.
+- **GPS capture** — tag a record with the phone's location, copy the
+  coordinates with one tap, and view all located records as pins on a map.
+- **Photo attachments** — snap or attach photos per grave; they're resized in
+  the browser and stored in the database so they persist with the data.
 - **REST API** — clean JSON endpoints so other clients can read/write too.
 
 ## Tech
@@ -56,6 +59,10 @@ sure the phone is on the same network and visit `http://<your-computer-ip>:3000`
 | `GET`    | `/api/records?q=&session_id=` | Search records (FTS5) or list recent |
 | `GET`    | `/api/records/:id`            | Get one record                       |
 | `DELETE` | `/api/records/:id`            | Delete a record                      |
+| `POST`   | `/api/records/:id/photos`     | Attach a photo `{data: "data:image/...;base64,..."}` |
+| `GET`    | `/api/records/:id/photos`     | List a record's photos (metadata)    |
+| `GET`    | `/api/photos/:id`             | Fetch a photo's image bytes          |
+| `DELETE` | `/api/photos/:id`             | Delete a photo                       |
 
 ### Example
 

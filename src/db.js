@@ -45,6 +45,16 @@ db.exec(`
   CREATE INDEX IF NOT EXISTS idx_records_session ON records(session_id);
   CREATE INDEX IF NOT EXISTS idx_records_name ON records(deceased_name);
 
+  -- Photos attached to a record, stored inline so they persist with the DB.
+  CREATE TABLE IF NOT EXISTS photos (
+    id          INTEGER PRIMARY KEY AUTOINCREMENT,
+    record_id   INTEGER NOT NULL REFERENCES records(id) ON DELETE CASCADE,
+    mime        TEXT NOT NULL,
+    bytes       BLOB NOT NULL,
+    created_at  TEXT NOT NULL DEFAULT (datetime('now'))
+  );
+  CREATE INDEX IF NOT EXISTS idx_photos_record ON photos(record_id);
+
   -- Full-text search over the human-readable fields of each record.
   CREATE VIRTUAL TABLE IF NOT EXISTS records_fts USING fts5(
     deceased_name, section, plot, notes, recorded_by,
@@ -144,7 +154,8 @@ export function searchRecords({ q, sessionId, limit = 50, offset = 0 } = {}) {
     if (sessionId) where += ` AND r.session_id = @sessionId`, (params.sessionId = sessionId);
     return db
       .prepare(
-        `SELECT r.*, s.name AS session_name, bm25(records_fts) AS rank
+        `SELECT r.*, s.name AS session_name, bm25(records_fts) AS rank,
+                (SELECT COUNT(*) FROM photos p WHERE p.record_id = r.id) AS photo_count
          FROM records_fts
          JOIN records r ON r.id = records_fts.rowid
          JOIN sessions s ON s.id = r.session_id
@@ -160,7 +171,8 @@ export function searchRecords({ q, sessionId, limit = 50, offset = 0 } = {}) {
   if (sessionId) where += ` AND r.session_id = @sessionId`, (params.sessionId = sessionId);
   return db
     .prepare(
-      `SELECT r.*, s.name AS session_name
+      `SELECT r.*, s.name AS session_name,
+              (SELECT COUNT(*) FROM photos p WHERE p.record_id = r.id) AS photo_count
        FROM records r
        JOIN sessions s ON s.id = r.session_id
        WHERE ${where}
@@ -179,6 +191,29 @@ function ftsQuery(q) {
     .filter(Boolean);
   if (!tokens.length) return '""';
   return tokens.map((t) => `${t}*`).join(' ');
+}
+
+// --- Photo helpers ----------------------------------------------------------
+export function addPhoto(recordId, mime, buffer) {
+  if (!getRecord(recordId)) throw new Error(`Record ${recordId} not found`);
+  const info = db
+    .prepare(`INSERT INTO photos (record_id, mime, bytes) VALUES (?, ?, ?)`)
+    .run(recordId, mime, buffer);
+  return { id: info.lastInsertRowid, record_id: recordId, mime };
+}
+
+export function getPhoto(id) {
+  return db.prepare(`SELECT * FROM photos WHERE id = ?`).get(id);
+}
+
+export function listPhotos(recordId) {
+  return db
+    .prepare(`SELECT id, mime, created_at FROM photos WHERE record_id = ? ORDER BY id`)
+    .all(recordId);
+}
+
+export function deletePhoto(id) {
+  return db.prepare(`DELETE FROM photos WHERE id = ?`).run(id).changes > 0;
 }
 
 export function stats() {

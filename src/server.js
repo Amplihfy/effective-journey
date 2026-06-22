@@ -4,13 +4,15 @@ import { dirname, join } from 'node:path';
 import {
   createSession, getSession, listSessions, endSession,
   addRecord, getRecord, deleteRecord, searchRecords, stats,
+  addPhoto, getPhoto, listPhotos, deletePhoto,
 } from './db.js';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-app.use(express.json());
+// Photos arrive as base64 data URLs, so allow a larger JSON body.
+app.use(express.json({ limit: '12mb' }));
 
 // Serve the responsive dashboard (works on iPhone + desktop).
 app.use(express.static(join(__dirname, '..', 'public')));
@@ -76,6 +78,40 @@ app.get('/api/records/:id', wrap((req, res) => {
 app.delete('/api/records/:id', wrap((req, res) => {
   const ok = deleteRecord(Number(req.params.id));
   if (!ok) return res.status(404).json({ error: 'Record not found' });
+  res.status(204).end();
+}));
+
+// --- Photos -----------------------------------------------------------------
+function decodeDataUrl(dataUrl) {
+  const m = /^data:([\w/+.-]+);base64,(.+)$/s.exec(dataUrl || '');
+  if (!m) throw new Error('Invalid image data');
+  const mime = m[1];
+  if (!mime.startsWith('image/')) throw new Error('Only image files are allowed');
+  const buf = Buffer.from(m[2], 'base64');
+  if (!buf.length) throw new Error('Empty image');
+  if (buf.length > 8_000_000) throw new Error('Image too large (max ~8MB)');
+  return { mime, buf };
+}
+
+app.post('/api/records/:id/photos', wrap((req, res) => {
+  const { mime, buf } = decodeDataUrl((req.body || {}).data);
+  res.status(201).json(addPhoto(Number(req.params.id), mime, buf));
+}));
+
+app.get('/api/records/:id/photos', wrap((req, res) =>
+  res.json(listPhotos(Number(req.params.id)))));
+
+app.get('/api/photos/:id', wrap((req, res) => {
+  const photo = getPhoto(Number(req.params.id));
+  if (!photo) return res.status(404).json({ error: 'Photo not found' });
+  res.setHeader('Content-Type', photo.mime);
+  res.setHeader('Cache-Control', 'public, max-age=31536000, immutable');
+  res.send(photo.bytes);
+}));
+
+app.delete('/api/photos/:id', wrap((req, res) => {
+  const ok = deletePhoto(Number(req.params.id));
+  if (!ok) return res.status(404).json({ error: 'Photo not found' });
   res.status(204).end();
 }));
 
