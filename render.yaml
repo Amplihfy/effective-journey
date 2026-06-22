@@ -1,0 +1,21 @@
+# Render deployment blueprint for the Cemetery Dashboard.
+# Render reads this file to know how to build and run the app.
+# Docs: https://render.com/docs/blueprint-spec
+services:
+  - type: web
+    name: cemetery-dashboard
+    runtime: node
+    plan: free
+    branch: claude/cemetery-dashboard-db-1gu8bt
+    buildCommand: npm install
+    startCommand: npm start
+    envVars:
+      - key: NODE_VERSION
+        value: "22"
+    # NOTE: The free plan uses temporary storage, so records can reset when the
+    # app restarts. To keep data permanently, upgrade the plan and attach a
+    # persistent disk (uncomment below), or switch to a hosted database.
+    # disk:
+    #   name: cemetery-data
+    #   mountPath: /opt/render/project/src/data
+    #   sizeGB: 1
