@@ -1,0 +1,19 @@
+{
+  "name": "cemetery-dashboard",
+  "version": "1.0.0",
+  "description": "A connected cemetery dashboard that writes session data to a SQLite database, searchable from iPhone or desktop.",
+  "type": "module",
+  "main": "src/server.js",
+  "scripts": {
+    "start": "node src/server.js",
+    "seed": "node src/seed.js",
+    "dev": "node --watch src/server.js"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "dependencies": {
+    "better-sqlite3": "^11.3.0",
+    "express": "^4.19.2"
+  }
+}
